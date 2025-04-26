@@ -1,0 +1,7 @@
+fastapi==0.111.0
+uvicorn==0.29.0   # local testing
+llama-index-core==0.10.35
+llama-index-vector-stores-supabase==0.10.35
+groq==0.7.0             # official SDK
+supabase==2.5.3
+python-dotenv==1.0.*    # optional local env loading
