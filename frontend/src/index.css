@@ -1,0 +1,127 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 187 100% 33%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 36 100% 50%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 187 100% 33%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 187 100% 25%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 187 100% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 187 50% 30%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 187 30% 30%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 187 100% 42%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 36 100% 50%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 187 100% 42%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+  
+  .progress-ring-circle {
+    @apply transition-all duration-1000 ease-out transform origin-center;
+  }
+  
+  .upload-zone {
+    @apply border-2 border-dashed rounded-lg p-8 transition-all duration-300 ease-in-out;
+  }
+  
+  .upload-zone-active {
+    @apply border-primary-teal bg-primary-teal/5 animate-pulse-border;
+  }
+  
+  .timeline-item {
+    @apply relative pl-8 pb-8 border-l-2 border-gray-200 ml-4;
+  }
+  
+  .timeline-item::before {
+    @apply content-[''] absolute w-4 h-4 rounded-full bg-white border-2 border-primary-teal -left-[9px] top-0;
+  }
+  
+  .timeline-item-medication::before {
+    @apply bg-primary-teal;
+  }
+  
+  .timeline-item-exercise::before {
+    @apply bg-accent-orange;
+  }
+  
+  .timeline-item-appointment::before {
+    @apply bg-primary-light;
+  }
+
+  .call-button {
+    @apply fixed bottom-6 right-6 bg-primary-teal text-white rounded-full p-4 shadow-lg hover:bg-primary-light transition-colors z-50;
+  }
+}
