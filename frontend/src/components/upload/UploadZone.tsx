@@ -84,27 +84,57 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
     formData.append("file", pdfFile);
     
     try {
-      // Start progress indication
+      // Step 1: Upload the PDF file
       setProgress(10);
-      
-      // Make the API call to your FastAPI endpoint
-      const response = await fetch("http://127.0.0.1:8000/upload-pdf", {
+      const uploadResponse = await fetch("http://127.0.0.1:8000/upload-pdf", {
         method: "POST",
         body: formData,
-        // You may need to handle CORS and credentials depending on your setup
-        // credentials: 'include',
       });
       
-      // Update progress
-      setProgress(70);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
         throw new Error(errorData.detail || "Upload failed");
       }
       
-      // Get response data
-      const data = await response.json();
+      // Get upload response data with the filename
+      const uploadData = await uploadResponse.json();
+      const filename = uploadData.filename;
+      
+      // Step 2: Process the PDF (ingest)
+      setProgress(40);
+      const ingestResponse = await fetch("http://127.0.0.1:8000/ingest-pdf/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filename }),
+      });
+      
+      if (!ingestResponse.ok) {
+        const errorData = await ingestResponse.json();
+        throw new Error(errorData.detail || "PDF ingestion failed");
+      }
+      
+      // Get ingest response
+      await ingestResponse.json();
+      
+      // Step 3: Initialize events from the PDF
+      setProgress(70);
+      const eventsResponse = await fetch("http://127.0.0.1:8000/initialize-events/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filename }),
+      });
+      
+      if (!eventsResponse.ok) {
+        const errorData = await eventsResponse.json();
+        throw new Error(errorData.detail || "Event initialization failed");
+      }
+      
+      // Get events response
+      const eventsData = await eventsResponse.json();
       
       // Complete progress
       setProgress(100);
@@ -113,21 +143,21 @@ const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
       setUploadState(UploadState.SUCCESS);
       toast({
         title: "Upload successful",
-        description: data.message || "Your recovery plan is being created",
+        description: "Your recovery plan has been created successfully",
       });
       
-      // Call the success callback if provided
+      // Call the success callback if provided (navigate to dashboard)
       if (onUploadSuccess) {
         setTimeout(() => {
           onUploadSuccess();
         }, 1000);
       }
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Process error:", error);
       
       setUploadState(UploadState.ERROR);
       toast({
-        title: "Upload failed",
+        title: "Process failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive"
       });
