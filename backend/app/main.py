@@ -1,15 +1,19 @@
+import os
+from dotenv import load_dotenv
+import nest_asyncio
+nest_asyncio.apply()
+
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+
 from app.services.file_upload_service import save_uploaded_pdf
 from app.services.pdf_reader_service import load_pdf_as_documents
 from app.services.ingestion_pipeline_service import process_documents
 from app.services.vector_store_service import store_nodes_in_supabase
 from app.services.embedding_service import get_embedding_model
 from app.services.query_service import query_vector_store
-import os
-from dotenv import load_dotenv
-import nest_asyncio
+from app.services.initialize_events_service import initialize_events_from_pdf
 
 nest_asyncio.apply()
 
@@ -36,6 +40,9 @@ async def upload_pdf(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail="Internal server error.")
     
 class IngestRequest(BaseModel):
+    filename: str
+
+class InitializeEventsRequest(BaseModel):
     filename: str
     
 @app.post("/ingest-pdf/")
@@ -81,4 +88,16 @@ async def query_knowledgebase(q: str):
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error during query: {str(e)}")
+    
+@app.post("/initialize-events/")
+async def initialize_events(request: InitializeEventsRequest):
+    try:
+        inserted_count = initialize_events_from_pdf(request.filename)
+        return {"message": f"✅ Initialized events from PDF", "events_inserted": inserted_count}
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Server error during event initialization: {str(e)}")
 
