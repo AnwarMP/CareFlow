@@ -1,4 +1,5 @@
 import os
+import traceback
 from dotenv import load_dotenv
 import nest_asyncio
 nest_asyncio.apply()
@@ -16,6 +17,7 @@ from app.services.query_service import query_vector_store
 from app.services.initialize_events_service import initialize_events_from_pdf
 from app.services.event_service import get_all_events
 from app.services.event_service import update_event_status
+from app.services.clear_db_service import clear_documents_and_events
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -65,11 +67,16 @@ async def update_status(request: UpdateEventStatusRequest):
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
     try:
+        # 1. Clear existing DB entries
+        clear_documents_and_events()
+
+        # 2. Save new file
         filename = await save_uploaded_pdf(file)
         return JSONResponse(content={"filename": filename, "message": "Upload successful!"})
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        print("UPLOAD ERROR:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Internal server error.")
     
 class IngestRequest(BaseModel):
