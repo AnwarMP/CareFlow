@@ -35,10 +35,24 @@ _SUMMARY_PROMPT = PromptTemplate(
 )
 
 def postcall_agent(transcript: str) -> dict:
-    prompt = _SUMMARY_PROMPT.format(transcript=transcript)
-    summary = _groq_client.chat.completions.create(
-        messages=[{"role": "user", "content": prompt}],
-        model="deepseek-r1-distill-llama-70b",  # Specify model here
-        temperature=0.2,
-    ).choices[0].message.content
-    return {"summary": summary}
+    try:
+        print(f"[DEBUG] postcall_agent called with transcript of length: {len(transcript)}")
+        
+        prompt = _SUMMARY_PROMPT.format(transcript=transcript)
+        print(f"[DEBUG] Formatted prompt: {prompt[:100]}...")
+        
+        print("[DEBUG] Sending request to Groq API...")
+        summary = _groq_client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="deepseek-r1-distill-llama-70b",  # Specify model here
+            temperature=0.2,
+        ).choices[0].message.content
+        
+        print(f"[DEBUG] Received summary of length: {len(summary)}")
+        print(f"[DEBUG] Summary preview: {summary[:100]}...")
+        
+        return {"summary": summary}
+    except Exception as e:
+        error_msg = f"AGENT ERROR: {str(e)}"
+        print(error_msg)
+        return {"error": error_msg}
