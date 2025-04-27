@@ -15,11 +15,21 @@ from app.services.embedding_service import get_embedding_model
 from app.services.query_service import query_vector_store
 from app.services.initialize_events_service import initialize_events_from_pdf
 
+from fastapi.middleware.cors import CORSMiddleware
+
 nest_asyncio.apply()
 
 load_dotenv()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # Replace with your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():

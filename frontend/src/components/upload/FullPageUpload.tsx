@@ -5,9 +5,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface FullPageUploadProps {
   isLoading?: boolean;
+  onUploadSuccess?: () => void;
 }
 
-const FullPageUpload: React.FC<FullPageUploadProps> = ({ isLoading = false }) => {
+const FullPageUpload: React.FC<FullPageUploadProps> = ({ isLoading = false, onUploadSuccess }) => {
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto animate-pulse">
@@ -89,7 +90,7 @@ const FullPageUpload: React.FC<FullPageUploadProps> = ({ isLoading = false }) =>
         </p>
         
         <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6">
-          <UploadZone />
+          <UploadZone onUploadSuccess={onUploadSuccess} />
         </div>
         
         <div className="mt-8 text-center">

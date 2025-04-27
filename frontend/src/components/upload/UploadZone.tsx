@@ -10,7 +10,11 @@ enum UploadState {
   ERROR
 }
 
-const UploadZone: React.FC = () => {
+interface UploadZoneProps {
+  onUploadSuccess?: () => void;
+}
+
+const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
   const [uploadState, setUploadState] = useState<UploadState>(UploadState.IDLE);
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
@@ -71,25 +75,63 @@ const UploadZone: React.FC = () => {
     }
   };
 
-  const processPdfFile = (pdfFile: File) => {
+  const processPdfFile = async (pdfFile: File) => {
     setFile(pdfFile);
     setUploadState(UploadState.UPLOADING);
     
-    // Simulate upload progress
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 5;
-      setProgress(currentProgress);
+    // Create a FormData object to send the file
+    const formData = new FormData();
+    formData.append("file", pdfFile);
+    
+    try {
+      // Start progress indication
+      setProgress(10);
       
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setUploadState(UploadState.SUCCESS);
-        toast({
-          title: "Upload successful",
-          description: "Your recovery plan is being created",
-        });
+      // Make the API call to your FastAPI endpoint
+      const response = await fetch("http://127.0.0.1:8000/upload-pdf", {
+        method: "POST",
+        body: formData,
+        // You may need to handle CORS and credentials depending on your setup
+        // credentials: 'include',
+      });
+      
+      // Update progress
+      setProgress(70);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Upload failed");
       }
-    }, 200);
+      
+      // Get response data
+      const data = await response.json();
+      
+      // Complete progress
+      setProgress(100);
+      
+      // Show success state
+      setUploadState(UploadState.SUCCESS);
+      toast({
+        title: "Upload successful",
+        description: data.message || "Your recovery plan is being created",
+      });
+      
+      // Call the success callback if provided
+      if (onUploadSuccess) {
+        setTimeout(() => {
+          onUploadSuccess();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      
+      setUploadState(UploadState.ERROR);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
   const resetUpload = () => {
