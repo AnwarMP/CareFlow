@@ -1,13 +1,15 @@
-
 import React from "react";
 import ProgressRing from "./ProgressChart";
 
 interface MainProgressRingProps {
-  progress: number;
-  streak: number;
+  completedCount: number;
+  totalCount: number;
 }
 
-const MainProgressRing = ({ progress, streak }: MainProgressRingProps) => {
+const MainProgressRing = ({ completedCount, totalCount }: MainProgressRingProps) => {
+  // Calculate the overall progress
+  const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
   const getStatusColor = (value: number) => {
     if (value >= 75) return "#4CAF50";
     if (value >= 50) return "#FFC107";
@@ -29,8 +31,10 @@ const MainProgressRing = ({ progress, streak }: MainProgressRingProps) => {
         </div>
       </div>
       
-      <div className="mt-4 bg-primary-teal/10 rounded-full px-4 py-2 flex items-center">
-        <span className="text-primary-teal font-medium">{streak} Day Streak! 🔥</span>
+      <div className="mt-2 text-center">
+        <p className="text-gray-600">
+          <span className="font-medium">{completedCount}</span> of <span className="font-medium">{totalCount}</span> tasks completed
+        </p>
       </div>
     </div>
   );
