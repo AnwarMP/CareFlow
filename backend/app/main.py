@@ -14,6 +14,8 @@ from app.services.vector_store_service import store_nodes_in_supabase
 from app.services.embedding_service import get_embedding_model
 from app.services.query_service import query_vector_store
 from app.services.initialize_events_service import initialize_events_from_pdf
+from app.services.event_service import get_all_events
+from app.services.event_service import update_event_status
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -38,6 +40,27 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+@app.get("/get-events")
+async def get_events():
+    try:
+        events = get_all_events()
+        return events
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+class UpdateEventStatusRequest(BaseModel):
+    id: str
+    status: str  # 'pending', 'completed', or 'missed'
+
+@app.post("/update-event-status")
+async def update_status(request: UpdateEventStatusRequest):
+    try:
+        update_event_status(request.id, request.status)
+        return {"message": "Status updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
