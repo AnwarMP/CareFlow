@@ -9,6 +9,6 @@ def settings():
         "SUPABASE_SERVICE_ROLE_KEY":    os.environ["SUPABASE_SERVICE_ROLE_KEY"],
         "GROQ_API_KEY":                 os.environ["GROQ_API_KEY"],
         "POSTGRES_CONN":                os.environ["POSTGRES_CONNECTION_STRING"],
-        "EMBED_DIM":                    1536,              # keep in sync with model
+        "EMBED_DIM":                    384,              # keep in sync with model
         "OPENAI_API_KEY":               os.environ["OPENAI_API_KEY"]
     }

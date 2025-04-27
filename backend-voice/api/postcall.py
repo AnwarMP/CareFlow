@@ -37,22 +37,12 @@ app = FastAPI()
 async def webhook(req: Request, x_elevenlabs_signature: str | None = Header(None)):
     try:
         raw = await req.body()
-
-        payload = jwt.decode(
-        os.environ["SUPABASE_SERVICE_ROLE_KEY"],
-        options={"verify_signature": False})
-        print(payload["role"])
-
-
-        # verify(x_elevenlabs_signature, raw)
         payload = json.loads(raw)
         
         # For debugging
         print(f"Received payload: {payload}")
 
         transcript = payload["transcript"]
-
-
         print(f"Received transcript: {transcript}")
         
         print("Calling Agent")
@@ -61,21 +51,29 @@ async def webhook(req: Request, x_elevenlabs_signature: str | None = Header(None
         # For debugging
         print(f"Agent result: {result}")
 
-
-        # Parse the agent result into insertable elements
-        
-        # Insert into the call_logs table
+        # Insert into the call_logs table (for record keeping)
         try:
             insert_result = _client.table("call_logs").insert({
                 "patient_id": "test",
                 "transcript": payload["transcript"],
                 "summary": result["summary"],
+                # "pain_level": result.get("pain_level", 0),
+                # "symptoms": ", ".join(result.get("symptoms", [])),
+                # "events_updated": result.get("events_updated", 0)
             }).execute()
-            print(f"Insert result: {insert_result}")
-            return {"status": "ok", "summary": result["summary"]}
+            
+            return {
+                "status": "ok", 
+                "summary": result["summary"],
+                "events_updated": result.get("events_updated", 0)
+            }
         except Exception as e:
             print(f"Insert error: {str(e)}")
-            return {"status": "error", "message": f"Database error: {str(e)}", "summary": result["summary"]}
+            return {
+                "status": "partial", 
+                "message": f"Database error: {str(e)}", 
+                "summary": result["summary"]
+            }
     except Exception as e:
         print(f"Webhook error: {str(e)}")
         raise HTTPException(500, f"Error: {str(e)}")
