@@ -14,11 +14,7 @@ const Dashboard = () => {
           <ThreeDayView />
         </div>
         
-        <ComplianceDashboard data={{
-          medication: 85,
-          exercise: 65,
-          appointment: 100,
-        }} />
+        <ComplianceDashboard/>
       </div>
     </Layout>
   );

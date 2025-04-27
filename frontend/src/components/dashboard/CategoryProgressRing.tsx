@@ -1,15 +1,23 @@
-
 import React from "react";
 import ProgressRing from "./ProgressChart";
 import { LucideIcon } from "lucide-react";
 
 interface CategoryProgressRingProps {
   title: string;
-  progress: number;
+  completedCount: number;
+  totalCount: number;
   icon: LucideIcon;
 }
 
-const CategoryProgressRing = ({ title, progress, icon: Icon }: CategoryProgressRingProps) => {
+const CategoryProgressRing = ({ 
+  title, 
+  completedCount, 
+  totalCount, 
+  icon: Icon 
+}: CategoryProgressRingProps) => {
+  // Calculate the progress percentage
+  const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
   const getStatusColor = (value: number) => {
     if (value >= 75) return "#4CAF50";
     if (value >= 50) return "#FFC107";
@@ -41,6 +49,10 @@ const CategoryProgressRing = ({ title, progress, icon: Icon }: CategoryProgressR
           strokeWidth={10}
           color={getStatusColor(progress)}
         />
+      </div>
+      
+      <div className="mt-4 text-center text-sm text-gray-600">
+        <span className="font-medium">{completedCount}</span> of <span className="font-medium">{totalCount}</span> completed
       </div>
     </div>
   );
