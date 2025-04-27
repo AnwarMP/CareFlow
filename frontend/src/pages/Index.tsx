@@ -20,17 +20,17 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // If we're still checking the upload status, show a simple loading state
-  if (hasUploadedPlan === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
+  // // If we're still checking the upload status, show a simple loading state
+  // if (hasUploadedPlan === null) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="animate-pulse">Loading...</div>
+  //     </div>
+  //   );
+  // }
 
   // If no plan has been uploaded, show the full page upload component
-  if (hasUploadedPlan === false) {
+  if (hasUploadedPlan === false || hasUploadedPlan === null) {
     return <FullPageUpload isLoading={isLoading} />;
   }
 
